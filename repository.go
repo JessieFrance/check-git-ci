@@ -1,6 +1,7 @@
 package checkgitci
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -18,6 +19,12 @@ var ErrorFailedAPICall = errors.New("bad Response from GitHub API")
 // GitHub API for viewing commmits.
 func commitsURL(owner, name string) string {
 	return fmt.Sprintf("%s/repos/%s/%s/commits", baseURL, owner, name)
+}
+
+// setRunsURL sets the GitHub API url on a repository for the check-runs API endpoint.
+func (r *Repository) setRunsURL() {
+	r.RunsURL = fmt.Sprintf("%s/repos/%s/%s/commits/%s/check-runs", baseURL, r.Owner, r.Name, r.Sha)
+
 }
 
 // NewRepository takes an owner and name as string fields, and returns
@@ -64,4 +71,42 @@ func makeGetRequest(url string) ([]byte, error) {
 		return nil, err
 	}
 	return bodyBytes, nil
+}
+
+// GetMostRecentCommit queries the GitHub commits API endpoint,
+// finds the Sha hash for the most recent Git commit in a repository,
+// and stores it in the Sha field of a Repository struct. Except in testing, it should
+// not take any arguments. The function returns an error or nil if no error.
+func (r *Repository) GetMostRecentCommit(params ...getMostRecentCommitArgs) error {
+	// Commits Api
+	url := baseURL + "/repos/" + r.Owner + "/" + r.Name + "/commits"
+
+	// If parameters are provided, then try to override the default url.
+	// This should be for testing purposes only.
+	if len(params) > 0 {
+		url = params[0].url
+	}
+
+	// Make the GET request.
+	bodyBytes, err := makeGetRequest(url)
+	if err != nil {
+		return err
+	}
+
+	// Unmarshall into the response object.
+	var responseObject CommitsAPI
+	json.Unmarshal(bodyBytes, &responseObject)
+
+	// If the slice is empty, return empty string.
+	if len(responseObject) == 0 {
+		return nil
+	}
+
+	// Set last commit.
+	r.Sha = responseObject[0].Sha
+
+	// Set the check runs url.
+	r.setRunsURL()
+
+	return nil
 }

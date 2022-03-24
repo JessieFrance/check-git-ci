@@ -33,3 +33,10 @@ type Run struct {
 	StartedAt   time.Time `json:"started_at"`
 	CompletedAt time.Time `json:"completed_at"`
 }
+
+// getMostRecentCommitArgs overrides the url used in
+// the GetMostRecentCommit function. This argument
+// should only be supplied in testing.
+type getMostRecentCommitArgs struct {
+	url string
+}
