@@ -1,11 +1,18 @@
 package checkgitci
 
 import (
+	"errors"
 	"fmt"
+	"io"
+	"net/http"
 )
 
 // Base URL for GitHub API
 const baseURL = "https://api.github.com"
+
+// ErrorFailedAPICall is returned when we receive an error or bad response
+// from the GitHub API.
+var ErrorFailedAPICall = errors.New("bad Response from GitHub API")
 
 // commitsURL takes a repository owner and name, and returns the url to the
 // GitHub API for viewing commmits.
@@ -22,4 +29,39 @@ func NewRepository(owner, name string) *Repository {
 		Name:       name,
 		CommitsURL: commitsURL(owner, name),
 	}
+}
+
+// makeGetRequest helps make get requests. It takes a url, and
+// returns a slice of bytes and an error (or nil if no error).
+func makeGetRequest(url string) ([]byte, error) {
+
+	// Get http request.
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	// Add headers.
+	req.Header.Add("Accept", "application/json")
+	req.Header.Add("Content-Type", "application/json")
+
+	// Make request.
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	// Check that the response was ok.
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("bad status code: %d - %s: %w", resp.StatusCode, resp.Status, ErrorFailedAPICall)
+	}
+
+	// Read response body into slice of bytes.
+	bodyBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	return bodyBytes, nil
 }
