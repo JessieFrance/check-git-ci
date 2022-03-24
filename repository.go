@@ -78,8 +78,8 @@ func makeGetRequest(url string) ([]byte, error) {
 // and stores it in the Sha field of a Repository struct. Except in testing, it should
 // not take any arguments. The function returns an error or nil if no error.
 func (r *Repository) GetMostRecentCommit(params ...getMostRecentCommitArgs) error {
-	// Set commits API url.
-	url := commitsURL(r.Owner, r.Name)
+	// Get commits API url.
+	url := r.CommitsURL
 
 	// If parameters are provided, then try to override the default url.
 	// This should be for testing purposes only.
