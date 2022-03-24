@@ -105,8 +105,35 @@ func (r *Repository) GetMostRecentCommit(params ...getMostRecentCommitArgs) erro
 	// Set last commit.
 	r.Sha = responseObject[0].Sha
 
+	return nil
+}
+
+// CheckRuns queries the GitHub check-runs API endpoint,
+// and attaches select JSON to the Repository struct RunsResult field.
+// This function should not take any arguments, except during testing.
+// CheckRuns returns an error or nil if no error.
+func (r *Repository) CheckRuns(params ...checkRunsArgs) error {
+
 	// Set the check runs url.
 	r.setRunsURL()
+	url := r.RunsURL
 
+	// Override the url if user supplies one (like in testing).
+	if len(params) > 0 {
+		url = params[0].url
+	}
+
+	// Make the request.
+	bodyBytes, err := makeGetRequest(url)
+
+	// Check for error.
+	if err != nil {
+		return err
+	}
+
+	// Unmarshall into the RunsResult field.
+	json.Unmarshal(bodyBytes, &r.RunsResult)
+
+	// No error, so return nil.
 	return nil
 }

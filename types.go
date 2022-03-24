@@ -40,3 +40,10 @@ type Run struct {
 type getMostRecentCommitArgs struct {
 	url string
 }
+
+// checkRunsArgs overrides the url used in
+// the CheckRuns function. This argument should only
+// be supplied in testing.
+type checkRunsArgs struct {
+	url string
+}
