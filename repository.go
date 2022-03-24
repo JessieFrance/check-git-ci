@@ -57,7 +57,8 @@ func makeGetRequest(url string) ([]byte, error) {
 
 	// Check that the response was ok.
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("bad status code: %d - %s: %w", resp.StatusCode, resp.Status, ErrorFailedAPICall)
+		// TODO: Consider giving more informative error.
+		return nil, ErrorFailedAPICall
 	}
 
 	// Read response body into slice of bytes.
