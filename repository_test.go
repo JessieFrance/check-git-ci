@@ -39,6 +39,22 @@ func TestMostRecentCommitWasSuccess(t *testing.T) {
 				completed: false,
 			},
 		},
+		{
+			testName:  "no repository owner",
+			repoOwner: "",
+			repoName:  "react",
+			commitsServer: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				// This should never be called since owner is blank...
+			})),
+			runsServer: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				// This should never be called since owner is blank...
+			})),
+			expected: TestResult{
+				err:       NoRepositoryOwner,
+				success:   false,
+				completed: false,
+			},
+		},
 	}
 
 	// Iterate over each individual test case (tc).
