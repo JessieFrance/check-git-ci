@@ -162,3 +162,27 @@ func (r *Repository) RunsAreSuccessful() {
 	// If we made it this far, runs were successful.
 	r.Success = true
 }
+
+// RunsAreComplete sets the repository "Completed" field to true
+// if all the CI runs for the last commit are complete, or if
+// there are no runs at all. This function sets the Completed state
+// to false if some runs are still pending.
+func (r *Repository) RunsAreComplete() {
+	// Set Completed to true if there are no runs.
+	if r.RunsResult.TotalCount == 0 {
+		r.Completed = true
+	}
+
+	// Iterate over runs.
+	for _, run := range r.RunsResult.CheckRuns {
+		// If current run is not complete,
+		// return early.
+		if run.Status != "completed" {
+			r.Completed = false
+			return
+		}
+	}
+	// All runs have been checked, and are complete
+	// if we made it this far.
+	r.Completed = true
+}
