@@ -13,7 +13,15 @@ const baseURL = "https://api.github.com"
 
 // ErrorFailedAPICall is returned when we receive an error or bad response
 // from the GitHub API.
-var ErrorFailedAPICall = errors.New("bad Response from GitHub API")
+var ErrorFailedAPICall = errors.New("Error: bad Response from GitHub API")
+
+// NoRepositoryName is returned when trying to perform an operation that requires
+// a repository name that has not yet been set.
+var NoRepositoryName = errors.New("Error: repository name field cannot be blank")
+
+// NoRepositoryOwner is returned when trying to perform an operation that requires
+// a repository owner that has not yet been set.
+var NoRepositoryOwner = errors.New("Error: repository owner field cannot be blank")
 
 // commitsURL takes a repository owner and name, and returns the url to the
 // GitHub API for viewing commmits.
@@ -185,4 +193,56 @@ func (r *Repository) RunsAreComplete() {
 	// All runs have been checked, and are complete
 	// if we made it this far.
 	r.Completed = true
+}
+
+// MostRecentCommitWasSuccess makes API calls to get the most recent commit
+// and GitHub CI runs associated with that commit. This function then checks
+// if last commit was successful, and if the runs were all completed. This
+// function stores the results of these checks on the repository
+// Success and Completed fields. This function will return an error (or
+// nil if there is not an error).
+func (r *Repository) MostRecentCommitWasSuccess(params ...mostRecentCommitArgs) error {
+
+	// Throw errors if no owner/name.
+	if r.Name == "" {
+		return NoRepositoryName
+	}
+	if r.Owner == "" {
+		return NoRepositoryOwner
+	}
+
+	// Set the url for checking the most recent commit.
+	// If the user provided a url (like in a test),
+	// then override it.
+	url := r.CommitsURL
+	if len(params) > 0 {
+		url = params[0].commitsUrl
+	}
+
+	// Get the most recent commit.
+	err := r.GetMostRecentCommit(getMostRecentCommitArgs{url})
+	if err != nil {
+		return err
+	}
+
+	// Get url for checking the check-runs API.
+	// Override it (like for tests) if user provided arguments.
+	url = r.RunsURL
+	if len(params) > 0 {
+		url = params[0].runsUrl
+	}
+
+	// Check the individual CI runs.
+	err = r.CheckRuns(checkRunsArgs{url})
+	if err != nil {
+		return err
+	}
+
+	// Check if the CI runs were successful
+	// and Completed.
+	r.RunsAreSuccessful()
+	r.RunsAreComplete()
+
+	// No error.
+	return nil
 }

@@ -36,14 +36,22 @@ type Run struct {
 
 // getMostRecentCommitArgs overrides the url used in
 // the GetMostRecentCommit function. This argument
-// should only be supplied in testing.
+// should usually only be supplied for testing.
 type getMostRecentCommitArgs struct {
 	url string
 }
 
 // checkRunsArgs overrides the url used in
-// the CheckRuns function. This argument should only
-// be supplied in testing.
+// the CheckRuns function. This argument should
+// usually only be supplied for testing.
 type checkRunsArgs struct {
 	url string
+}
+
+// mostRecentCommitArgs overrides the urls used in
+// the MostRecentCommitWasSuccess function. This argument
+// should usually only be supplied for testing.
+type mostRecentCommitArgs struct {
+	commitsUrl string
+	runsUrl    string
 }
