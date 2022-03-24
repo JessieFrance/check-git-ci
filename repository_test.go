@@ -38,6 +38,32 @@ var mockRunsAPI1 = `{
 		     }
 		   ]
 		 }`
+var mockRunsAPI2 = `{
+		   "total_count": 3,
+		   "check_runs": [
+		     {
+		       "name": "Node.js 14 on windows",
+		       "status": "completed",
+		       "conclusion": "success",
+		       "started_at": "2022-02-14T01:38:26Z",
+		       "completed_at": "2022-02-14T01:42:29Z"
+		     },
+		     {
+		       "name": "Node.js 14 on ubuntu",
+		       "status": "completed",
+		       "conclusion": "success",
+		       "started_at": "2022-02-14T01:38:26Z",
+		       "completed_at": "2022-02-14T01:42:29Z"
+		     },
+		     {
+		       "name": "Node.js 14 on mac",
+		       "status": "completed",
+		       "conclusion": "failure",
+		       "started_at": "2022-02-14T01:38:26Z",
+		       "completed_at": "2022-02-14T01:42:29Z"
+		     }
+		   ]
+		 }`
 
 type TestResult struct {
 	err       error
@@ -142,6 +168,26 @@ func TestMostRecentCommitWasSuccess(t *testing.T) {
 			expected: TestResult{
 				err:       nil,
 				success:   true,
+				completed: true,
+			},
+		},
+		{
+			testName:  "1 failed run but all runs complete",
+			repoOwner: "facebook",
+			repoName:  "react",
+			commitsServer: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				// The response doesn't matter here as long as the status is ok, because only
+				// the response from the runsServer is important in this test case.
+				w.WriteHeader(http.StatusOK)
+				w.Write([]byte(mockCommitsAPI1))
+			})),
+			runsServer: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusOK)
+				w.Write([]byte(mockRunsAPI2))
+			})),
+			expected: TestResult{
+				err:       nil,
+				success:   false,
 				completed: true,
 			},
 		},
