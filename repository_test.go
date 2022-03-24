@@ -89,6 +89,24 @@ func TestMostRecentCommitWasSuccess(t *testing.T) {
 			},
 		},
 		{
+			testName:  "bad response from GitHub commits API",
+			repoOwner: "bad-octocat-owner",
+			repoName:  "bad-octocat-name",
+			commitsServer: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				// Send back a bad request.
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write([]byte(`octocat says that is not a real repository owner or name`))
+			})),
+			runsServer: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				// This server's response should no matter...
+			})),
+			expected: TestResult{
+				err:       ErrorFailedAPICall,
+				success:   false,
+				completed: false,
+			},
+		},
+		{
 			testName:  "3 successful and complete runs",
 			repoOwner: "facebook",
 			repoName:  "react",
