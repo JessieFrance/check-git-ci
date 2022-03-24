@@ -116,9 +116,9 @@ func (r *Repository) CheckRuns(params ...checkRunsArgs) error {
 
 	// Set the check runs url.
 	r.setRunsURL()
-	url := r.RunsURL
 
 	// Override the url if user supplies one (like in testing).
+	url := r.RunsURL
 	if len(params) > 0 {
 		url = params[0].url
 	}
@@ -136,4 +136,29 @@ func (r *Repository) CheckRuns(params ...checkRunsArgs) error {
 
 	// No error, so return nil.
 	return nil
+}
+
+// RunsAreSuccessful iterates over a repository's CI runs, and
+// sets the repository's "Success" field as either true or false.
+// The Success field will be set to false if there are no
+// runs, or if some runs were not successful. The Success field
+// will be true if there are runs, and they are all successful.
+func (r *Repository) RunsAreSuccessful() {
+
+	// If there are no runs, then use "zero value" for
+	// Success state.
+	if r.RunsResult.TotalCount == 0 {
+		r.Success = false
+	}
+
+	// Iterate over runs.
+	for _, run := range r.RunsResult.CheckRuns {
+		// If current run is unsuccessful, return early.
+		if run.Conclusion != "success" {
+			r.Success = false
+			return
+		}
+	}
+	// If we made it this far, runs were successful.
+	r.Success = true
 }
