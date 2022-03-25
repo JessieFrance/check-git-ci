@@ -42,10 +42,4 @@ jobs:
     
     # Run testing on the code
     - name: Run testing
-      run: go test -race -coverprofile=coverage.out -covermode=atomic -v
-
-    # Use Codecov to report/upload test coverage
-    - uses: codecov/codecov-action@v2
-      with:
-        fail_ci_if_error: true
-      
+      run: go test -v -cover
