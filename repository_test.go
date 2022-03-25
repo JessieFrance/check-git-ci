@@ -78,6 +78,11 @@ var mockRunsAPI3 = `{
 		   ]
 		 }`
 
+var mockRunsAPINoRuns = `{
+		   "total_count": 0,
+		   "check_runs": []
+		 }`
+
 type TestResult struct {
 	err       error
 	success   bool
@@ -222,6 +227,26 @@ func TestMostRecentCommitWasSuccess(t *testing.T) {
 				err:       nil,
 				success:   false,
 				completed: false,
+			},
+		},
+		{
+			testName:  "no runs",
+			repoOwner: "facebook",
+			repoName:  "react",
+			commitsServer: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				// The response doesn't matter here as long as the status is ok, because only
+				// the response from the runsServer is important in this test case.
+				w.WriteHeader(http.StatusOK)
+				w.Write([]byte(mockCommitsAPI1))
+			})),
+			runsServer: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusOK)
+				w.Write([]byte(mockRunsAPINoRuns))
+			})),
+			expected: TestResult{
+				err:       nil,
+				success:   false,
+				completed: true,
 			},
 		},
 	}
