@@ -102,6 +102,9 @@ func (r *Repository) GetMostRecentCommit(params ...getMostRecentCommitArgs) erro
 	// Set last commit.
 	r.Sha = responseObject[0].Sha
 
+	// Set the check runs url.
+	r.setRunsURL()
+
 	return nil
 }
 
@@ -111,14 +114,14 @@ func (r *Repository) GetMostRecentCommit(params ...getMostRecentCommitArgs) erro
 // CheckRuns returns an error or nil if no error.
 func (r *Repository) CheckRuns(params ...checkRunsArgs) error {
 
-	// Set the check runs url.
-	r.setRunsURL()
-
 	// Override the url if user supplies one (like in testing).
 	url := r.RunsURL
 	if len(params) > 0 {
 		url = params[0].url
 	}
+
+	// TODO: Check url is not blank if user is calling this function
+	// independently.
 
 	// Make the request.
 	bodyBytes, err := makeGetRequest(url)
