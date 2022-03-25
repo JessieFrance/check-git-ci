@@ -145,6 +145,7 @@ func (r *Repository) RunsAreSuccessful() {
 	// Success state.
 	if r.RunsResult.TotalCount == 0 {
 		r.Success = false
+		return
 	}
 
 	// Iterate over runs.
@@ -167,6 +168,7 @@ func (r *Repository) RunsAreComplete() {
 	// Set Completed to true if there are no runs.
 	if r.RunsResult.TotalCount == 0 {
 		r.Completed = true
+		return
 	}
 
 	// Iterate over runs.
