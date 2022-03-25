@@ -93,7 +93,8 @@ func (r *Repository) GetMostRecentCommit(params ...getMostRecentCommitArgs) erro
 	var responseObject CommitsAPI
 	json.Unmarshal(bodyBytes, &responseObject)
 
-	// If the slice is empty, return empty string.
+	// If the slice is empty, just return nil without setting
+	// most recent commit.
 	if len(responseObject) == 0 {
 		return nil
 	}
@@ -195,10 +196,10 @@ func (r *Repository) MostRecentCommitWasSuccess(params ...mostRecentCommitArgs) 
 
 	// Throw errors if no owner/name.
 	if r.Name == "" {
-		return NoRepositoryName
+		return ErrorNoRepositoryName
 	}
 	if r.Owner == "" {
-		return NoRepositoryOwner
+		return ErrorNoRepositoryOwner
 	}
 
 	// Set the url for checking the most recent commit.
@@ -206,7 +207,7 @@ func (r *Repository) MostRecentCommitWasSuccess(params ...mostRecentCommitArgs) 
 	// then override it.
 	url := r.CommitsURL
 	if len(params) > 0 {
-		url = params[0].commitsUrl
+		url = params[0].commitsURL
 	}
 
 	// Get the most recent commit.
@@ -219,7 +220,7 @@ func (r *Repository) MostRecentCommitWasSuccess(params ...mostRecentCommitArgs) 
 	// Override it (like for tests) if user provided arguments.
 	url = r.RunsURL
 	if len(params) > 0 {
-		url = params[0].runsUrl
+		url = params[0].runsURL
 	}
 
 	// Check the individual CI runs.

@@ -52,6 +52,6 @@ type checkRunsArgs struct {
 // the MostRecentCommitWasSuccess function. This argument
 // should usually only be supplied for testing.
 type mostRecentCommitArgs struct {
-	commitsUrl string
-	runsUrl    string
+	commitsURL string
+	runsURL    string
 }

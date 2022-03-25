@@ -111,7 +111,7 @@ func TestMostRecentCommitWasSuccess(t *testing.T) {
 				// This should never be called since name is blank...
 			})),
 			expected: TestResult{
-				err:       NoRepositoryName,
+				err:       ErrorNoRepositoryName,
 				success:   false,
 				completed: false,
 			},
@@ -127,7 +127,7 @@ func TestMostRecentCommitWasSuccess(t *testing.T) {
 				// This should never be called since owner is blank...
 			})),
 			expected: TestResult{
-				err:       NoRepositoryOwner,
+				err:       ErrorNoRepositoryOwner,
 				success:   false,
 				completed: false,
 			},
@@ -263,8 +263,8 @@ func TestMostRecentCommitWasSuccess(t *testing.T) {
 		// Make a call via receiver to the TestMostRecentCommitWasSuccess
 		// function, but override the urls to use test urls.
 		err := repo.MostRecentCommitWasSuccess(mostRecentCommitArgs{
-			commitsUrl: tc.commitsServer.URL,
-			runsUrl:    tc.runsServer.URL,
+			commitsURL: tc.commitsServer.URL,
+			runsURL:    tc.runsServer.URL,
 		})
 
 		// Check for the expected error.
