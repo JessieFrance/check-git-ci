@@ -1,0 +1,45 @@
+name: CICD
+
+# Trigger the workflow on push or pull request
+# events but only for the main branch
+on:
+  push:
+    branches:
+    - main
+  pull_request:
+    branches:
+    - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Check out repository under $GITHUB_WORKSPACE
+    - uses: actions/checkout@v2
+    
+    # Setup Go
+    - name: Setup Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: '1.17'
+    
+    # Install all the dependencies
+    - name: Install dependencies
+      run: |
+        go version
+        go get -u golang.org/x/lint/golint
+        
+    # Run build of the application
+    - name: Run build
+      run: go build . 
+      
+    # Run vet & lint on the code
+    - name: Run vet & lint
+      run: |
+        go vet .
+        golint .
+    
+    # Run testing on the code
+    - name: Run testing
+      run: go test -v -cover
