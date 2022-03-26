@@ -64,7 +64,7 @@ func makeGetRequest(url string) ([]byte, error) {
 	// Read response body into slice of bytes.
 	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return nil, ErrorIOReadAll
 	}
 	return bodyBytes, nil
 }

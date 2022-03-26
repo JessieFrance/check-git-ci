@@ -170,6 +170,28 @@ func TestMostRecentCommitWasSuccess(t *testing.T) {
 			},
 		},
 		{
+			testName:  "io.ReadAll error",
+			repoOwner: "facebook",
+			repoName:  "react",
+			commitsServer: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				// This reponse doesn't matter here, only the runsServer.
+				w.WriteHeader(http.StatusOK)
+				w.Write([]byte(mockCommitsAPI1))
+			})),
+			runsServer: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				// Simulate an io.ReadAll error:
+				// https://stackoverflow.com/questions/53171123/how-to-force-error-on-reading-response-body
+				w.Header().Set("Content-Length", "1")
+				w.WriteHeader(http.StatusOK)
+				w.Write([]byte(`The response here is not of length 1 as specified in the header`))
+			})),
+			expected: TestResult{
+				err:       ErrorIOReadAll,
+				success:   false,
+				completed: false,
+			},
+		},
+		{
 			testName:  "3 successful and complete runs",
 			repoOwner: "facebook",
 			repoName:  "react",
