@@ -84,9 +84,10 @@ var mockRunsAPINoRuns = `{
 		 }`
 
 type TestResult struct {
-	err       error
-	success   bool
-	completed bool
+	err          error
+	success      bool
+	completed    bool
+	hasCheckRuns bool
 }
 
 func TestMostRecentCommitWasSuccess(t *testing.T) {
@@ -111,9 +112,10 @@ func TestMostRecentCommitWasSuccess(t *testing.T) {
 				// This should never be called since name is blank...
 			})),
 			expected: TestResult{
-				err:       ErrorNoRepositoryName,
-				success:   false,
-				completed: false,
+				err:          ErrorNoRepositoryName,
+				success:      false,
+				completed:    false,
+				hasCheckRuns: false,
 			},
 		},
 		{
@@ -127,9 +129,10 @@ func TestMostRecentCommitWasSuccess(t *testing.T) {
 				// This should never be called since owner is blank...
 			})),
 			expected: TestResult{
-				err:       ErrorNoRepositoryOwner,
-				success:   false,
-				completed: false,
+				err:          ErrorNoRepositoryOwner,
+				success:      false,
+				completed:    false,
+				hasCheckRuns: false,
 			},
 		},
 		{
@@ -145,9 +148,10 @@ func TestMostRecentCommitWasSuccess(t *testing.T) {
 				// This server's response should no matter...
 			})),
 			expected: TestResult{
-				err:       ErrorFailedAPICall,
-				success:   false,
-				completed: false,
+				err:          ErrorFailedAPICall,
+				success:      false,
+				completed:    false,
+				hasCheckRuns: false,
 			},
 		},
 		{
@@ -164,9 +168,10 @@ func TestMostRecentCommitWasSuccess(t *testing.T) {
 				w.Write([]byte(`octocat says that is a bad request to check-runs api`))
 			})),
 			expected: TestResult{
-				err:       ErrorFailedAPICall,
-				success:   false,
-				completed: false,
+				err:          ErrorFailedAPICall,
+				success:      false,
+				completed:    false,
+				hasCheckRuns: false,
 			},
 		},
 		{
@@ -186,9 +191,10 @@ func TestMostRecentCommitWasSuccess(t *testing.T) {
 				w.Write([]byte(`The response here is not of length 1 as specified in the header`))
 			})),
 			expected: TestResult{
-				err:       ErrorIOReadAll,
-				success:   false,
-				completed: false,
+				err:          ErrorIOReadAll,
+				success:      false,
+				completed:    false,
+				hasCheckRuns: false,
 			},
 		},
 		{
@@ -206,9 +212,10 @@ func TestMostRecentCommitWasSuccess(t *testing.T) {
 				w.Write([]byte(mockRunsAPI1))
 			})),
 			expected: TestResult{
-				err:       nil,
-				success:   true,
-				completed: true,
+				err:          nil,
+				success:      true,
+				completed:    true,
+				hasCheckRuns: true,
 			},
 		},
 		{
@@ -226,9 +233,10 @@ func TestMostRecentCommitWasSuccess(t *testing.T) {
 				w.Write([]byte(mockRunsAPI2))
 			})),
 			expected: TestResult{
-				err:       nil,
-				success:   false,
-				completed: true,
+				err:          nil,
+				success:      false,
+				completed:    true,
+				hasCheckRuns: true,
 			},
 		},
 		{
@@ -246,9 +254,10 @@ func TestMostRecentCommitWasSuccess(t *testing.T) {
 				w.Write([]byte(mockRunsAPI3))
 			})),
 			expected: TestResult{
-				err:       nil,
-				success:   false,
-				completed: false,
+				err:          nil,
+				success:      false,
+				completed:    false,
+				hasCheckRuns: true,
 			},
 		},
 		{
@@ -266,9 +275,10 @@ func TestMostRecentCommitWasSuccess(t *testing.T) {
 				w.Write([]byte(mockRunsAPINoRuns))
 			})),
 			expected: TestResult{
-				err:       nil,
-				success:   false,
-				completed: true,
+				err:          nil,
+				success:      false,
+				completed:    true,
+				hasCheckRuns: false,
 			},
 		},
 	}
@@ -302,6 +312,11 @@ func TestMostRecentCommitWasSuccess(t *testing.T) {
 		// Check for expected completed state.
 		if repo.Completed != tc.expected.completed {
 			t.Errorf("expected repository completed field to be %v but got %v", tc.expected.completed, repo.Completed)
+		}
+
+		// Check for expected hasCheckRuns status.
+		if repo.HasCheckRuns != tc.expected.hasCheckRuns {
+			t.Errorf("expected repository hasCheckRuns field to be %v but got %v", tc.expected.hasCheckRuns, repo.HasCheckRuns)
 		}
 
 	}

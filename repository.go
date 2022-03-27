@@ -134,6 +134,18 @@ func (r *Repository) CheckRuns(params ...checkRunsArgs) error {
 	// Unmarshall into the RunsResult field.
 	json.Unmarshal(bodyBytes, &r.RunsResult)
 
+	// Check if there are runs...
+	if r.RunsResult.TotalCount == 0 {
+		// No runs, so set state variables.
+		r.HasCheckRuns = false
+		r.Success = false
+		r.Completed = true
+	} else {
+		// There are runs, and other state variables can be
+		// set later.
+		r.HasCheckRuns = true
+	}
+
 	// No error, so return nil.
 	return nil
 }
@@ -145,10 +157,8 @@ func (r *Repository) CheckRuns(params ...checkRunsArgs) error {
 // will be true if there are runs, and they are all successful.
 func (r *Repository) RunsAreSuccessful() {
 
-	// If there are no runs, then use "zero value" for
-	// Success state.
-	if r.RunsResult.TotalCount == 0 {
-		r.Success = false
+	// If there are no runs, then return early.
+	if !r.HasCheckRuns {
 		return
 	}
 
@@ -169,9 +179,8 @@ func (r *Repository) RunsAreSuccessful() {
 // there are no runs at all. This function sets the Completed state
 // to false if some runs are still pending.
 func (r *Repository) RunsAreComplete() {
-	// Set Completed to true if there are no runs.
-	if r.RunsResult.TotalCount == 0 {
-		r.Completed = true
+	// If there are no runs, return early.
+	if !r.HasCheckRuns {
 		return
 	}
 

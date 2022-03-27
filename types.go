@@ -4,14 +4,15 @@ import "time"
 
 // Repository type holds information for individual Git repositories.
 type Repository struct {
-	Owner      string
-	Name       string
-	Sha        string
-	RunsResult CheckRunsAPI
-	Success    bool
-	Completed  bool
-	CommitsURL string
-	RunsURL    string
+	Owner        string
+	Name         string
+	Sha          string
+	RunsResult   CheckRunsAPI
+	HasCheckRuns bool
+	Success      bool
+	Completed    bool
+	CommitsURL   string
+	RunsURL      string
 }
 
 // CommitsAPI holds selected information on the response from GitHub commits API.
