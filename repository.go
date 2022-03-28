@@ -71,8 +71,10 @@ func makeGetRequest(url string) ([]byte, error) {
 
 // GetMostRecentCommit queries the GitHub commits API endpoint,
 // finds the Sha hash for the most recent Git commit in a repository,
-// and stores it in the Sha field of a Repository struct. Except in testing, it should
-// not take any arguments. The function returns an error or nil if no error.
+// and stores it in the Sha field of a Repository struct.
+// This function returns an error or nil if no error. This function also
+// takes optional arguments (for example to override the url for the
+// GitHub commits API), but these are mostly for testing.
 func (r *Repository) GetMostRecentCommit(params ...getMostRecentCommitArgs) error {
 	// Get commits API url.
 	url := r.CommitsURL
@@ -108,10 +110,11 @@ func (r *Repository) GetMostRecentCommit(params ...getMostRecentCommitArgs) erro
 	return nil
 }
 
-// CheckRuns queries the GitHub check-runs API endpoint,
+// CheckRuns queries the GitHub check-runs API endpoint for workflows,
 // and attaches select JSON to the Repository struct RunsResult field.
-// This function should not take any arguments, except during testing.
 // CheckRuns returns an error or nil if no error.
+// This function also takes optional arguments (for example to override
+// the url for the GitHub workflows API), but these are mostly for testing.
 func (r *Repository) CheckRuns(params ...checkRunsArgs) error {
 
 	// Override the url if user supplies one (like in testing).
@@ -153,8 +156,9 @@ func (r *Repository) CheckRuns(params ...checkRunsArgs) error {
 // RunsAreSuccessful iterates over a repository's CI runs, and
 // sets the repository's "Success" field as either true or false.
 // The Success field will be set to false if there are no
-// runs, or if some runs were not successful. The Success field
-// will be true if there are runs, and they are all successful.
+// runs (in CheckRuns function), or if some runs were not successful.
+// The Success field will be true if there are runs, and they are
+// all marked as "success" or "skipped".
 func (r *Repository) RunsAreSuccessful() {
 
 	// If there are no runs, then return early.
@@ -177,9 +181,9 @@ func (r *Repository) RunsAreSuccessful() {
 }
 
 // RunsAreComplete sets the repository "Completed" field to true
-// if all the CI runs for the last commit are complete, or if
-// there are no runs at all. This function sets the Completed state
-// to false if some runs are still pending.
+// if all the CI runs for the last commit are complete.
+// This function sets the Completed state to false if some runs
+// are still pending.
 func (r *Repository) RunsAreComplete() {
 	// If there are no runs, return early.
 	if !r.HasCheckRuns {

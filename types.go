@@ -26,7 +26,7 @@ type CheckRunsAPI struct {
 	CheckRuns  []Run `json:"check_runs"`
 }
 
-// Run holds selected information on an individual GitHub CI run.
+// Run holds selected information on an individual GitHub CI workflow run.
 type Run struct {
 	Name        string    `json:"name"`
 	Status      string    `json:"status"`
