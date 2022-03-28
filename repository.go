@@ -164,14 +164,16 @@ func (r *Repository) RunsAreSuccessful() {
 
 	// Iterate over runs.
 	for _, run := range r.RunsResult.CheckRuns {
-		// If current run is unsuccessful, return early.
-		if run.Conclusion != "success" {
+		// If current run is neither successful nor skipped, then
+		// return early.
+		if run.Conclusion != "success" && run.Conclusion != "skipped" {
 			r.Success = false
 			return
 		}
 	}
 	// If we made it this far, runs were successful.
 	r.Success = true
+
 }
 
 // RunsAreComplete sets the repository "Completed" field to true
