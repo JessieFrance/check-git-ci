@@ -7,9 +7,6 @@ import (
 	"net/http"
 )
 
-// Base URL for GitHub API
-const baseURL = "https://api.github.com"
-
 // commitsURL takes a repository owner and name, and returns the url to the
 // GitHub API for viewing commmits.
 func commitsURL(owner, name string) string {
