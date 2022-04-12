@@ -45,6 +45,15 @@ func (r *Repository) SetKey(key string) {
 	r.RateManager = rm
 }
 
+// genKeyIsSet returns true if the general key (intended to be shared amongst
+// several repositories) is set for a RateManager, and false otherwise.
+func (r *Repository) genKeyIsSet() bool {
+	if len(r.RateManager.APIKeys[generalKey]) > 0 {
+		return true
+	}
+	return false
+}
+
 // makeGetRequest helps make get requests. It takes a url, and
 // returns a slice of bytes and an error (or nil if no error).
 func makeGetRequest(url string) ([]byte, error) {
