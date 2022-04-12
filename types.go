@@ -2,6 +2,24 @@ package checkgitci
 
 import "time"
 
+// APIHeaders holds string headers that contain information for when
+// individual API endpoints were last modified.
+type APIHeaders struct {
+	CommitsHeader string
+	RunsHeader    string
+}
+
+// RateManager type holds information for GitHub API rate limits.
+// The Remaining field specifies API calls remaining, APIKeys is
+// a map for repositories to APIKeys, and the call headers utilize
+// the GitHub "Last-Modified" field to so that a 304 response
+// does not count against rate limits.
+type RateManager struct {
+	Remaining   map[string]int
+	APIKeys     map[string]string
+	CallHeaders map[string]APIHeaders
+}
+
 // Repository type holds information for individual Git repositories.
 type Repository struct {
 	Owner        string
