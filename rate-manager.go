@@ -1,5 +1,9 @@
 package checkgitci
 
+// generalKey is a string meant to be used for a single rate manager that
+// contains a GitHub API for multiple repositories.
+const generalKey = "general-key"
+
 // NewRateManager returns a RateManager struct.
 func NewRateManager() RateManager {
 	return RateManager{
@@ -7,4 +11,10 @@ func NewRateManager() RateManager {
 		APIKeys:     make(map[string]string),
 		CallHeaders: make(map[string]APIHeaders),
 	}
+}
+
+// SetKey sets a general key intended for a single RateManager,
+// that may be used for multiple repositories.
+func (r *RateManager) SetKey(key string) {
+	r.APIKeys[generalKey] = key
 }
