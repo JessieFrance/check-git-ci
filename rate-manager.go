@@ -14,3 +14,8 @@ func NewRateManager() RateManager {
 func (r *RateManager) SetKey(key string) {
 	r.APIKeys[generalKey] = key
 }
+
+// GetRemaining returns the remaining API calls for a RateManager.
+func (r *RateManager) GetRemaining() int {
+	return r.Remaining[generalKey]
+}

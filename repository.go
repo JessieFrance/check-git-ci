@@ -54,6 +54,11 @@ func (r *Repository) genKeyIsSet() bool {
 	return false
 }
 
+// GetRemaining returns the remaining GitHub API calls for a repository.
+func (r *Repository) GetRemaining() int {
+	return r.RateManager.Remaining[r.getRepoLookup()]
+}
+
 // makeGetRequest helps make get requests. It takes a url, and
 // returns a slice of bytes and an error (or nil if no error).
 func makeGetRequest(url string) ([]byte, error) {
