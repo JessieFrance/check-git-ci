@@ -23,10 +23,12 @@ func (r *Repository) setRunsURL() {
 // a pointer to a Repository. It automatically uses the owner and name fields
 // to set the CommitsURL field.
 func NewRepository(owner, name string) *Repository {
+	rm := NewRateManager()
 	return &Repository{
-		Owner:      owner,
-		Name:       name,
-		CommitsURL: commitsURL(owner, name),
+		Owner:       owner,
+		Name:        name,
+		CommitsURL:  commitsURL(owner, name),
+		RateManager: &rm,
 	}
 }
 

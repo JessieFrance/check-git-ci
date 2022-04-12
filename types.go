@@ -31,6 +31,7 @@ type Repository struct {
 	Completed    bool
 	CommitsURL   string
 	RunsURL      string
+	RateManager  *RateManager
 }
 
 // CommitsAPI holds selected information on the response from GitHub commits API.
