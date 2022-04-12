@@ -19,6 +19,12 @@ func (r *Repository) setRunsURL() {
 
 }
 
+// getRepoLookup returns a string that represents the lookup key for a
+// repository.
+func (r *Repository) getRepoLookup() string {
+	return fmt.Sprintf("%s%s", r.Owner, r.Name)
+}
+
 // NewRepository takes an owner and name as string fields, and returns
 // a pointer to a Repository. It automatically uses the owner and name fields
 // to set the CommitsURL field.
@@ -30,6 +36,13 @@ func NewRepository(owner, name string) *Repository {
 		CommitsURL:  commitsURL(owner, name),
 		RateManager: &rm,
 	}
+}
+
+// SetKey sets a GitHub API key for a specific repository.
+func (r *Repository) SetKey(key string) {
+	rm := r.RateManager
+	rm.APIKeys[r.getRepoLookup()] = key
+	r.RateManager = rm
 }
 
 // makeGetRequest helps make get requests. It takes a url, and
