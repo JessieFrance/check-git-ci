@@ -59,6 +59,20 @@ func (r *Repository) GetRemaining() int {
 	return r.RateManager.Remaining[r.getRepoLookup()]
 }
 
+// setCommitsHeader sets the header for the GitHub commits API.
+func (r *Repository) setCommitsHeader(lookup, commitsHeader string) {
+	entry := r.RateManager.CallHeaders[lookup]
+	entry.CommitsHeader = commitsHeader
+	r.RateManager.CallHeaders[lookup] = entry
+}
+
+// setRunsHeader sets the header for the GitHub check-runs API.
+func (r *Repository) setRunsHeader(lookup, runsHeader string) {
+	entry := r.RateManager.CallHeaders[lookup]
+	entry.RunsHeader = runsHeader
+	r.RateManager.CallHeaders[lookup] = entry
+}
+
 // makeGetRequest helps make get requests. It takes a url, and
 // returns a slice of bytes and an error (or nil if no error).
 func makeGetRequest(url string) ([]byte, error) {
