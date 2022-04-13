@@ -89,10 +89,34 @@ func (r *Repository) GetMostRecentCommit(params ...getMostRecentCommitArgs) erro
 		url = params[0].url
 	}
 
+	// Get the API key (if there is one) for either this repository, or
+	// a RateManager for multiple repositories.
+	key := r.getCorrectKey()
+
+	// Generate arguments for making GET request.
+	lookup := r.getRepoLookup()
+	args := makeRequestArgs{
+		url:          url,
+		lastModified: r.RateManager.CallHeaders[lookup].CommitsHeader,
+		apiKey:       key,
+	}
 	// Make the GET request.
-	bodyBytes, err := makeGetRequest(url)
+	bodyBytes, commitsHeader, remaining, err := makeGetRequest(args)
 	if err != nil {
 		return err
+	}
+
+	// Set the commits header for making future GitHub API requests for
+	// this repository.
+	r.setCommitsHeader(lookup, commitsHeader)
+
+	// Set the 'remaining' variable on either a general
+	// rate manager, or on this repository.
+	r.updateRemaining(lookup, remaining)
+
+	// If bodyBytes are nil (for respones 304), return early.
+	if bodyBytes == nil {
+		return nil
 	}
 
 	// Unmarshall into the response object.
@@ -111,6 +135,7 @@ func (r *Repository) GetMostRecentCommit(params ...getMostRecentCommitArgs) erro
 	// Set the check runs url.
 	r.setRunsURL()
 
+	// No error.
 	return nil
 }
 
