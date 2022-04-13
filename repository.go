@@ -70,6 +70,14 @@ func (r *Repository) setRunsHeader(lookup, runsHeader string) {
 	r.RateManager.CallHeaders[lookup] = entry
 }
 
+// setRemaining uses a string lookup to set an integer value for remaining
+// GitHub API calls.
+func (r *Repository) setRemaining(lookup string, remaining int) {
+	entry := r.RateManager.Remaining
+	entry[lookup] = remaining
+	r.RateManager.Remaining = entry
+}
+
 // RunsAreSuccessful iterates over a repository's CI runs, and
 // sets the repository's "Success" field as either true or false.
 // The Success field will be set to false if there are no
@@ -135,4 +143,14 @@ func (r *Repository) getCorrectKey() string {
 		key = r.RateManager.APIKeys[generalKey]
 	}
 	return key
+}
+
+// updateRemaining sets the remaining field for a lookup on either
+// the current Repository, or on a general rate manager.
+func (r *Repository) updateRemaining(lookup string, remaining int) {
+	if r.genKeyIsSet() {
+		r.setRemaining(generalKey, remaining)
+	} else {
+		r.setRemaining(lookup, remaining)
+	}
 }
