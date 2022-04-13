@@ -2,44 +2,75 @@ package checkgitci
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 )
 
-// makeGetRequest helps make get requests. It takes a url, and
-// returns a slice of bytes and an error (or nil if no error).
-func makeGetRequest(url string) ([]byte, error) {
+// makeGetRequest helps make get requests. It takes a sturct that
+// contains a url, lastModified, and API key field, and
+// returns a slice of bytes for the API content, a string for the new last modified
+// header, an int for the remaining API calls, and an error (or nil if no error).
+func makeGetRequest(requestInput makeRequestArgs) ([]byte, string, int, error) {
+
+	// Extract information.
+	url := requestInput.url
+	lastModified := requestInput.lastModified
+	apiKey := requestInput.apiKey
 
 	// Get http request.
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return nil, err
+		return nil, "", -1, err
 	}
 
 	// Add headers.
-	req.Header.Add("Accept", "application/json")
+	req.Header.Add("Accept", "application/vnd.github.v3+json")
 	req.Header.Add("Content-Type", "application/json")
+	if len(lastModified) > 0 {
+		req.Header.Add("If-Modified-Since", lastModified)
+	}
+	if len(apiKey) > 0 {
+		req.Header.Add("Authorization", fmt.Sprintf("token %s", apiKey))
+	}
 
 	// Make request.
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, "", -1, err
 	}
 	defer resp.Body.Close()
 
 	// Check that the response was ok.
 	if resp.StatusCode != http.StatusOK {
-		// TODO: Consider giving more informative error.
-		return nil, ErrorFailedAPICall
+		return nil, "", -1, ErrorFailedAPICall
+	}
+
+	// Get last modified and remaining.
+	newLastModified := resp.Header.Get("Last-Modified")
+	remainingStr := resp.Header.Get("x-ratelimit-remaining")
+
+	// Convert remaining string to int.
+	remaining, err := strconv.Atoi(remainingStr)
+	if err != nil {
+		return nil, newLastModified, -1, err
+	}
+
+	// Check for 304, and return early if so.
+	if resp.StatusCode == http.StatusNotModified {
+		return nil, newLastModified, remaining, nil
 	}
 
 	// Read response body into slice of bytes.
 	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, ErrorIOReadAll
+		return nil, "", -1, ErrorIOReadAll
 	}
-	return bodyBytes, nil
+
+	// Return.
+	return bodyBytes, newLastModified, remaining, nil
 }
 
 // GetMostRecentCommit queries the GitHub commits API endpoint,

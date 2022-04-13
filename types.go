@@ -54,6 +54,14 @@ type Run struct {
 	CompletedAt time.Time `json:"completed_at"`
 }
 
+// makeRequestArgs type holds the argument type for the function
+// makeGetRequest
+type makeRequestArgs struct {
+	url          string
+	lastModified string
+	apiKey       string
+}
+
 // getMostRecentCommitArgs overrides the url used in
 // the GetMostRecentCommit function. This argument
 // should usually only be supplied for testing.
