@@ -16,3 +16,7 @@ var ErrorNoRepositoryName = errors.New("Error: repository name field cannot be b
 // ErrorNoRepositoryOwner is returned when trying to perform an operation that requires
 // a repository owner that has not yet been set.
 var ErrorNoRepositoryOwner = errors.New("Error: repository owner field cannot be blank")
+
+// ErrorEmptyURL is returned when trying to perform an operation that requires a url,
+// but the url is blank.
+var ErrorEmptyURL = errors.New("Error: url field cannot be blank")

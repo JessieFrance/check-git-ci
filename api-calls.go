@@ -152,15 +152,40 @@ func (r *Repository) CheckRuns(params ...checkRunsArgs) error {
 		url = params[0].url
 	}
 
-	// TODO: Check url is not blank if user is calling this function
+	// Check url is not blank if user is calling this function
 	// independently.
+	if len(url) == 0 {
+		return ErrorEmptyURL
+	}
 
-	// Make the request.
-	bodyBytes, err := makeGetRequest(url)
+	// Get the API key (if there is one) for either this repository, or
+	// a RateManager for multiple repositories.
+	key := r.getCorrectKey()
 
-	// Check for error.
+	// Generate arguments for making GET request.
+	lookup := r.getRepoLookup()
+	args := makeRequestArgs{
+		url:          url,
+		lastModified: r.RateManager.CallHeaders[lookup].RunsHeader,
+		apiKey:       key,
+	}
+
+	// Make the request, and check for an error.
+	bodyBytes, runsHeader, remaining, err := makeGetRequest(args)
 	if err != nil {
 		return err
+	}
+
+	// Set the runs header for making future GitHub API requests for
+	// this repository.
+	r.setRunsHeader(lookup, runsHeader)
+
+	// Update the 'remaining' field.
+	r.updateRemaining(lookup, remaining)
+
+	// If bodyBytes are nil (for respones 304), return early.
+	if bodyBytes == nil {
+		return nil
 	}
 
 	// Unmarshall into the RunsResult field.
