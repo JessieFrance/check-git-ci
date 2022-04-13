@@ -186,6 +186,7 @@ func TestMostRecentCommitWasSuccess(t *testing.T) {
 			repoOwner: "facebook",
 			repoName:  "react",
 			commitsServer: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Add("x-ratelimit-remaining", "4999")
 				w.WriteHeader(http.StatusOK)
 				w.Write([]byte(mockCommitsAPI1))
 			})),
@@ -207,10 +208,12 @@ func TestMostRecentCommitWasSuccess(t *testing.T) {
 			repoName:  "react",
 			commitsServer: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				// This reponse doesn't matter here, only the runsServer.
+				w.Header().Add("x-ratelimit-remaining", "4999")
 				w.WriteHeader(http.StatusOK)
 				w.Write([]byte(mockCommitsAPI1))
 			})),
 			runsServer: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Add("x-ratelimit-remaining", "4998")
 				// Simulate an io.ReadAll error:
 				// https://stackoverflow.com/questions/53171123/how-to-force-error-on-reading-response-body
 				w.Header().Set("Content-Length", "1")
@@ -231,10 +234,12 @@ func TestMostRecentCommitWasSuccess(t *testing.T) {
 			commitsServer: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				// The response doesn't matter here as long as the status is ok, because only
 				// the response from the runsServer is important in this test case.
+				w.Header().Add("x-ratelimit-remaining", "4999")
 				w.WriteHeader(http.StatusOK)
 				w.Write([]byte(mockCommitsAPI1))
 			})),
 			runsServer: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Add("x-ratelimit-remaining", "4998")
 				w.WriteHeader(http.StatusOK)
 				w.Write([]byte(mockRunsAPI1))
 			})),
@@ -252,10 +257,12 @@ func TestMostRecentCommitWasSuccess(t *testing.T) {
 			commitsServer: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				// The response doesn't matter here as long as the status is ok, because only
 				// the response from the runsServer is important in this test case.
+				w.Header().Add("x-ratelimit-remaining", "4999")
 				w.WriteHeader(http.StatusOK)
 				w.Write([]byte(mockCommitsAPI1))
 			})),
 			runsServer: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Add("x-ratelimit-remaining", "4998")
 				w.WriteHeader(http.StatusOK)
 				w.Write([]byte(mockRunsAPI1))
 			})),
@@ -273,10 +280,12 @@ func TestMostRecentCommitWasSuccess(t *testing.T) {
 			commitsServer: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				// The response doesn't matter here as long as the status is ok, because only
 				// the response from the runsServer is important in this test case.
+				w.Header().Add("x-ratelimit-remaining", "4999")
 				w.WriteHeader(http.StatusOK)
 				w.Write([]byte(mockCommitsAPI1))
 			})),
 			runsServer: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Add("x-ratelimit-remaining", "4998")
 				w.WriteHeader(http.StatusOK)
 				w.Write([]byte(mockRunsAPI2))
 			})),
@@ -294,10 +303,12 @@ func TestMostRecentCommitWasSuccess(t *testing.T) {
 			commitsServer: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				// The response doesn't matter here as long as the status is ok, because only
 				// the response from the runsServer is important in this test case.
+				w.Header().Add("x-ratelimit-remaining", "4999")
 				w.WriteHeader(http.StatusOK)
 				w.Write([]byte(mockCommitsAPI1))
 			})),
 			runsServer: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Add("x-ratelimit-remaining", "4998")
 				w.WriteHeader(http.StatusOK)
 				w.Write([]byte(mockRunsAPI3))
 			})),
@@ -315,10 +326,12 @@ func TestMostRecentCommitWasSuccess(t *testing.T) {
 			commitsServer: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				// The response doesn't matter here as long as the status is ok, because only
 				// the response from the runsServer is important in this test case.
+				w.Header().Add("x-ratelimit-remaining", "4999")
 				w.WriteHeader(http.StatusOK)
 				w.Write([]byte(mockCommitsAPI1))
 			})),
 			runsServer: httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Add("x-ratelimit-remaining", "4999")
 				w.WriteHeader(http.StatusOK)
 				w.Write([]byte(mockRunsAPINoRuns))
 			})),
