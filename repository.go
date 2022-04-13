@@ -120,3 +120,19 @@ func (r *Repository) RunsAreComplete() {
 	// if we made it this far.
 	r.Completed = true
 }
+
+// getCorrectKey first checks if a repository has its own key set,
+// and if not, it trieds to access the general key (which might also
+// not be set).
+func (r *Repository) getCorrectKey() string {
+	// Try to lookup the key for this repository.
+	lookup := r.getRepoLookup()
+	key := r.RateManager.APIKeys[lookup]
+
+	// If the key for this repository has not been set, check if there is
+	// a general key (i.e. for a common rate manager).
+	if len(key) == 0 {
+		key = r.RateManager.APIKeys[generalKey]
+	}
+	return key
+}
